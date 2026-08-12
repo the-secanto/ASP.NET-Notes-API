@@ -22,6 +22,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.MapGet("/test", () => "This is a test to see the difference between Controller and regular mapping");
 app.MapControllers();
 
 app.Run();
