@@ -7,10 +7,25 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured. Set it via environment variables or appsettings.Development.json.");
+}
+
 builder.Services.AddDbContext<NotesDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
+var shouldSeedDatabase = args.Contains("--seed", StringComparer.OrdinalIgnoreCase);
+
+if (shouldSeedDatabase)
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<NotesDbContext>();
+    await DatabaseSeeder.SeedAsync(dbContext);
+    return;
+}
 
 if (app.Environment.IsDevelopment())
 {

@@ -2,5 +2,7 @@ bin/
 obj/
 .vs/
 .vscode/
+.env
+appsettings.Development.json
 *.user
 *.suo
