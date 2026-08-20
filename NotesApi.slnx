@@ -1,3 +1,7 @@
 <Solution>
-  <Project Path="NotesApi/NotesApi.csproj" />
+  <Project Path="NotesApi.Api/NotesApi.Api.csproj" />
+  <Project Path="NotesApi.Application/NotesApi.Application.csproj" />
+  <Project Path="NotesApi.Domain/NotesApi.Domain.csproj" />
+  <Project Path="NotesApi.Infrastructure/NotesApi.Infrastructure.csproj" />
+  <Project Path="NotesApi.Tests/NotesApi.Tests.csproj" />
 </Solution>

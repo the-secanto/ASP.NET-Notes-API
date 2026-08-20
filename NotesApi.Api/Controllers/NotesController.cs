@@ -1,24 +1,33 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NotesApi.Data;
-using NotesApi.Models;
+using NotesApi.Api.Models;
+using NotesApi.Application;
+using NotesApi.Domain;
 
-namespace NotesApi.Controllers;
+namespace NotesApi.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("notes")]
-public class NotesController(NotesDbContext dbContext) : ControllerBase
+public class NotesController : ControllerBase
 {
+    private readonly NoteService _noteService;
+
+    public NotesController(NoteService noteService)
+    {
+        _noteService = noteService;
+    }
+
     [HttpGet]
     public async Task<ActionResult<List<Note>>> GetNotes()
     {
-        return await dbContext.Notes.ToListAsync();
+        return await _noteService.GetAllAsync();
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Note>> GetNote(int id)
     {
-        var note = await dbContext.Notes.FindAsync(id);
+        var note = await _noteService.GetByIdAsync(id);
 
         return note is null ? NotFound() : Ok(note);
     }
@@ -32,16 +41,15 @@ public class NotesController(NotesDbContext dbContext) : ControllerBase
             Content = request.Content
         };
 
-        dbContext.Notes.Add(note);
-        await dbContext.SaveChangesAsync();
+        var created = await _noteService.CreateAsync(note);
 
-        return CreatedAtAction(nameof(GetNote), new { id = note.Id }, note);
+        return CreatedAtAction(nameof(GetNote), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateNote(int id, UpdateNoteRequest request)
     {
-        var note = await dbContext.Notes.FindAsync(id);
+        var note = await _noteService.GetByIdAsync(id);
         if (note is null)
         {
             return NotFound();
@@ -51,7 +59,7 @@ public class NotesController(NotesDbContext dbContext) : ControllerBase
         note.Content = request.Content;
         note.UpdatedAt = DateTime.UtcNow;
 
-        await dbContext.SaveChangesAsync();
+        await _noteService.UpdateAsync(note);
 
         return NoContent();
     }
@@ -59,15 +67,8 @@ public class NotesController(NotesDbContext dbContext) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteNote(int id)
     {
-        var note = await dbContext.Notes.FindAsync(id);
-        if (note is null)
-        {
-            return NotFound();
-        }
+        var deleted = await _noteService.DeleteAsync(id);
 
-        dbContext.Notes.Remove(note);
-        await dbContext.SaveChangesAsync();
-
-        return NoContent();
+        return deleted ? NoContent() : NotFound();
     }
 }

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace NotesApi.Controllers;
+namespace NotesApi.Api.Controllers;
 
 [ApiController]
-[Route("")] // The root (/) directory
+[Route("")]
 public class HomeController : ControllerBase
 {
     [HttpGet]

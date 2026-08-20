@@ -1,0 +1,34 @@
+@NotesApi_HostAddress = http://localhost:5062
+
+GET {{NotesApi_HostAddress}}/
+Accept: application/json
+
+###
+
+# 0. Create a new user
+POST {{NotesApi_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "password": "NewPassword1!"
+}
+
+###
+
+# 1. Get a JWT token
+POST {{NotesApi_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPassword1!"
+}
+
+###
+
+# 2. Use the token to call a protected endpoint
+GET {{NotesApi_HostAddress}}/notes
+Authorization: Bearer <paste-token-here>
+Accept: application/json

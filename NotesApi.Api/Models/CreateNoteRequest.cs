@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace NotesApi.Models;
+namespace NotesApi.Api.Models;
 
 public class CreateNoteRequest
 {
